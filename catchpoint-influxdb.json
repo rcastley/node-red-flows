@@ -1,0 +1,77 @@
+[
+   {
+      "id":"8552e78c.dbbb38",
+      "type":"http in",
+      "z":"bd4ce280.5d4e8",
+      "name":"",
+      "url":"/data",
+      "method":"post",
+      "upload":false,
+      "swaggerDoc":"",
+      "x":150,
+      "y":140,
+      "wires":[
+         [
+            "2f811f15.f752"
+         ]
+      ]
+   },
+   {
+      "id":"2f811f15.f752",
+      "type":"function",
+      "z":"bd4ce280.5d4e8",
+      "name":"ETL",
+      "func":"var type = msg.payload.TestDetail.MonitorTypeId;\n\nvar str = msg.payload.Summary.Timestamp;\nvar year = str.substring(0, 4);\nvar month = str.substring(4, 6);\nvar day = str.substring(6, 8);\nvar hour = str.substring(8, 10);\nvar minute = str.substring(10, 12);\nvar second = str.substring(12, 14);\nvar ms = str.substring(15, 18);\nvar date = new Date(year, month-1, day, hour, minute, second, ms);\n\nif (typeof msg.payload.Summary.Counter.JsFailures != \"undefined\") {\n    JsFailures = msg.payload.Summary.Counter.JsFailures;\n} else {\n    JsFailures = 0;\n}\n\nif (typeof msg.payload.Summary.Error != \"undefined\" && typeof msg.payload.Summary.Error.Code != \"undefined\") {\n    avail = 0;\n} else {\n    avail = 100;\n}\n\nif (typeof msg.payload.Summary.Timing.DocumentComplete != \"undefined\") {\n  docComplete = msg.payload.Summary.Timing.DocumentComplete;\n} else {\n  docComplete = 0;\n}\n\nif (typeof msg.payload.Summary.Timing.RenderStart != \"undefined\") {\n  renderStart = msg.payload.Summary.Timing.RenderStart;\n} else {\n  renderStart = 0;\n}\n\nif (typeof msg.payload.Summary.Timing.DomLoad != \"undefined\") {\n  domLoad = msg.payload.Summary.Timing.DomLoad;\n} else {\n  domLoad = 0;\n}\n\nif (typeof msg.payload.Summary.Byte != \"undefined\") {\n  totalContent = msg.payload.Summary.Byte.Response.TotalContent;\n  image = msg.payload.Summary.Byte.Response.ContentType.Image;\n  script = msg.payload.Summary.Byte.Response.ContentType.Script;\n  css = msg.payload.Summary.Byte.Response.ContentType.Css;\n  html = msg.payload.Summary.Byte.Response.ContentType.Html;\n} else {\n  totalContent = 0;\n  image = 0;\n  script = 0;\n  css = 0;\n  html = 0;\n}\n\nif (type == 18) {\n    msg.payload = [\n\t    {\n\t\t    measurement: \"test_timing\",\n\t\t    fields: {\n\t\t      total: msg.payload.Summary.Timing.Total,\n\t\t\t    dns: msg.payload.Summary.Timing.Dns,\n\t\t\t    wait: msg.payload.Summary.Timing.Wait,\n\t\t\t    docComplete: docComplete,\n\t\t\t    renderStart: renderStart,\n\t\t\t    domLoad: domLoad\n\t\t    },\n\t\t    tags:{\n\t\t\t    testname: msg.payload.TestDetail.Name,\n\t\t\t    nodename: msg.payload.NodeName\n\t\t    },\n\t\t    timestamp: date\n\t    },\n\t    {\n\t\t    measurement: \"test_byte\",\n\t\t    fields: {\n\t\t\t    totalContent: totalContent,\n\t\t\t    image: image,\n\t\t\t    script: script,\n\t\t\t    css: css,\n\t\t\t    html: html\n\t\t    },\n\t\t    tags:{\n\t\t\t    testname: msg.payload.TestDetail.Name,\n\t\t\t    nodename: msg.payload.NodeName\n\t\t    },\n\t\t    timestamp: date\n\t    },\n\t    {\n\t\t    measurement: \"test_counter\",\n\t\t    fields: {\n\t\t\t    hosts: msg.payload.Summary.Counter.Hosts,\n\t\t\t    requests: msg.payload.Summary.Counter.Requests,\n\t\t\t    failedRequests: msg.payload.Summary.Counter.FailedRequests,\n\t\t\t    JsFailures: JsFailures,\n\t\t\t    error: avail\n\t\t    },\n\t\t    tags:{\n\t\t\t    testname: msg.payload.TestDetail.Name,\n\t\t\t    nodename: msg.payload.NodeName\n\t\t    },\n\t\t    timestamp: date\n\t    }\n    ];\n\n    return msg;\n}",
+      "outputs":1,
+      "noerr":0,
+      "x":330,
+      "y":140,
+      "wires":[
+         [
+            "d2065533.409ed8",
+            "87f0f333.80b6d"
+         ]
+      ]
+   },
+   {
+      "id":"d2065533.409ed8",
+      "type":"influxdb batch",
+      "z":"bd4ce280.5d4e8",
+      "influxdb":"2be7c8fd.d795c8",
+      "precision":"",
+      "retentionPolicy":"",
+      "name":"InfluxDB",
+      "x":500,
+      "y":140,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"87f0f333.80b6d",
+      "type":"http response",
+      "z":"bd4ce280.5d4e8",
+      "name":"200 Status",
+      "statusCode":"200",
+      "headers":{
+
+      },
+      "x":510,
+      "y":200,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"2be7c8fd.d795c8",
+      "type":"influxdb",
+      "z":"",
+      "hostname":"127.0.0.1",
+      "port":"8086",
+      "protocol":"http",
+      "database":"catchpoint",
+      "name":"",
+      "usetls":false,
+      "tls":""
+   }
+]
