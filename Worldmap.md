@@ -1,2 +1,0 @@
-# Catchpoint Live Worldmap
-
