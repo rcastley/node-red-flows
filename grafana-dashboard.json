@@ -721,6 +721,7 @@
             "min": false,
             "rightSide": true,
             "show": true,
+            "sideWidth": 250,
             "sort": "current",
             "sortDesc": true,
             "total": false,
@@ -872,6 +873,7 @@
             "min": false,
             "rightSide": true,
             "show": true,
+            "sideWidth": 250,
             "total": false,
             "values": true
           },
@@ -1004,13 +1006,16 @@
           "fill": 2,
           "id": 14,
           "legend": {
-            "avg": false,
-            "current": false,
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
             "max": false,
             "min": false,
-            "show": false,
+            "rightSide": true,
+            "show": true,
+            "sideWidth": 250,
             "total": false,
-            "values": false
+            "values": true
           },
           "lines": true,
           "linewidth": 2,
@@ -1027,6 +1032,7 @@
           "steppedLine": false,
           "targets": [
             {
+              "alias": "$col",
               "dsType": "influxdb",
               "groupBy": [],
               "measurement": "test_counter",
@@ -1112,8 +1118,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "Dior",
-          "value": "Dior"
+          "text": "Cartier",
+          "value": "Cartier"
         },
         "datasource": "InfluxDB",
         "hide": 0,
@@ -1158,7 +1164,7 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {
@@ -1188,5 +1194,5 @@
   },
   "timezone": "",
   "title": "Catchpoint",
-  "version": 42
+  "version": 44
 }
